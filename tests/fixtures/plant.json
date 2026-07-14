@@ -1,0 +1,292 @@
+{
+  "all_inv_manut": false,
+  "arquivos": [],
+  "arvores_plantadas": 1072.8838236200002,
+  "bairro": null,
+  "baixa_irradiancia": true,
+  "cache_updated_at": "Mon, 13 Jul 2026 22:52:52 GMT",
+  "capacidade": 100.0,
+  "cidade": null,
+  "co2_evitado": 172.020744,
+  "configModulos": null,
+  "configscada": null,
+  "contatocelularnovo": "",
+  "contatoemailnovo": "",
+  "contatonomenovo": "",
+  "contatosUsina": [],
+  "datainstalacao": "2022-12-01",
+  "economia": 0.0,
+  "economia_hoje": 0.0,
+  "eday_usina": "504.20 kWh",
+  "emonth": 4463.3,
+  "endereco": null,
+  "estado": null,
+  "etotal_usina": "477.84 MWh",
+  "eyear": 14980.9,
+  "id": 57219,
+  "idcliente": 3595,
+  "idcredencialacesso": [
+    7
+  ],
+  "idplano": 4,
+  "inv_flagged_rules": [
+    [
+      3,
+      9
+    ]
+  ],
+  "inv_id": [
+    82374
+  ],
+  "inv_regras_ativas_tickets": [
+    {
+      "idinversor": 82374,
+      "idregras": [
+        3,
+        9
+      ]
+    }
+  ],
+  "inv_status": 2,
+  "inv_ts": [
+    "Mon, 13 Jul 2026 22:41:05 GMT"
+  ],
+  "invdetails": null,
+  "inversores": [
+    {
+      "descricao": "SIW400",
+      "esn": "TESTSERIAL0001",
+      "id": 82374,
+      "id_modelo": 563,
+      "idefusina": 57219,
+      "idmarca": 6,
+      "modelo": "SIW400G T100 W0",
+      "nome": "SIW400",
+      "parametros": {
+        "faseTensao": "FF",
+        "mapastrings": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "numMPPT": 9,
+        "numeroStrings": 18,
+        "potenciaInstalada": 100,
+        "temperatura": 90,
+        "tensaoCA": 440,
+        "tipoFase": "Trifasico"
+      },
+      "situacao": 1,
+      "status": 2,
+      "ulleitura": {
+        "CycleTime": 0,
+        "ETotal": 477835.4,
+        "Eac": 0,
+        "Eday": 504.2,
+        "Error": 0,
+        "Etotal": 477835.4,
+        "Fac1": 0.0,
+        "Fac2": 0.0,
+        "Fac3": 0.0,
+        "Iac1": 0.0,
+        "Iac2": 0.0,
+        "Iac3": 0.0,
+        "Inversor": "TESTSERIAL0001",
+        "Ipv1": 0.0,
+        "Ipv10": 0.0,
+        "Ipv11": 0.0,
+        "Ipv12": 0.0,
+        "Ipv2": 0.0,
+        "Ipv3": 0.0,
+        "Ipv4": 0.0,
+        "Ipv5": 0.0,
+        "Ipv6": 0.0,
+        "Ipv7": 0.0,
+        "Ipv8": 0.0,
+        "Ipv9": 0.0,
+        "Origem": "Foxess",
+        "Pac": 0.0,
+        "Pac1": 0.0,
+        "Pac2": 0.0,
+        "Pac3": 0.0,
+        "Qac": 0,
+        "Ri": 0,
+        "Status": 0,
+        "Temp": 0.0,
+        "TempDis": 0,
+        "Twr": 0,
+        "Uac1": 0.0,
+        "Uac2": 0.0,
+        "Uac3": 0.0,
+        "Upv1": 0.0,
+        "Upv10": 0.0,
+        "Upv11": 0.0,
+        "Upv12": 0.0,
+        "Upv2": 0.0,
+        "Upv3": 0.0,
+        "Upv4": 0.0,
+        "Upv5": 0.0,
+        "Upv6": 0.0,
+        "Upv7": 0.0,
+        "Upv8": 0.0,
+        "Upv9": 0.0,
+        "cos": 0.0,
+        "esn": "TESTSERIAL0001",
+        "fac": 0.0,
+        "tpLei": "EacOK",
+        "tsleitura": "2026-07-13 22:41:05"
+      },
+      "ultimaleitura": "Mon, 13 Jul 2026 22:41:05 GMT"
+    }
+  ],
+  "invmanut": [],
+  "invs_situacao": [
+    1
+  ],
+  "km_rodado_eletrico": 2556419.39,
+  "latitude": null,
+  "longitude": null,
+  "max_status": 2,
+  "modulosdetails": null,
+  "mqtt_credencial": null,
+  "nome": "Granja 03 - 100KW",
+  "nomeintegrador": "Integrator",
+  "offline": false,
+  "pais": null,
+  "plant_tz": -3,
+  "plat_updated_at": "Wed, 14 Jan 2026 13:22:41 GMT",
+  "portal": "Dongle SIW100G / SIW200G / SIW400G",
+  "potencia": null,
+  "pr": 0,
+  "problemas_inv": [
+    {
+      "descricao": "SIW400",
+      "id": 82374,
+      "inversor": true,
+      "mensagem": [
+        "<b>Falha: </b>A tensão da fase A (0.0 V) está em abaixo da tensão padrão para alarme de falha (110.0 V)<br><b>Limite: </b> 75.0%",
+        "<b>Falha: </b>A potência do inversor está zerada"
+      ],
+      "nome": "SIW400",
+      "status": 2,
+      "tsleitura": "Mon, 13 Jul 2026 22:41:05 GMT"
+    }
+  ],
+  "regrasativas": [
+    {
+      "idregra": 1,
+      "nome": "Sobretemperatura no inversor.",
+      "tipo": 0,
+      "valoralerta": 0,
+      "valorfalha": 7
+    },
+    {
+      "idregra": 14,
+      "nome": "Alerta de desempenho",
+      "tipo": 0,
+      "valoralerta": 20,
+      "valorfalha": 30
+    },
+    {
+      "idregra": 7,
+      "nome": "Tensão CC Zeradas.",
+      "tipo": 0,
+      "valoralerta": 20,
+      "valorfalha": 30
+    },
+    {
+      "idregra": 2,
+      "nome": "Sobretensao na rede.",
+      "tipo": 0,
+      "valoralerta": 8,
+      "valorfalha": 10
+    },
+    {
+      "idregra": 3,
+      "nome": "Subtensao na rede.",
+      "tipo": 0,
+      "valoralerta": 50,
+      "valorfalha": 75
+    },
+    {
+      "idregra": 9,
+      "nome": "Potência zerada",
+      "tipo": 0,
+      "valoralerta": null,
+      "valorfalha": null
+    },
+    {
+      "idregra": 8,
+      "nome": "Corrente CC Zeradas.",
+      "tipo": 0,
+      "valoralerta": null,
+      "valorfalha": null
+    },
+    {
+      "idregra": 11,
+      "nome": "Trackers alarmados",
+      "tipo": 0,
+      "valoralerta": null,
+      "valorfalha": null
+    },
+    {
+      "idregra": 6,
+      "nome": "Sem Coleta.",
+      "tipo": 0,
+      "valoralerta": 1,
+      "valorfalha": 10
+    },
+    {
+      "idregra": 4,
+      "nome": "Queda ou desequilibrio de tensao de fase.",
+      "tipo": 0,
+      "valoralerta": 10,
+      "valorfalha": 15
+    },
+    {
+      "idregra": 5,
+      "nome": "Queda no envio de dados - Inversores",
+      "tipo": 0,
+      "valoralerta": 0,
+      "valorfalha": 0
+    },
+    {
+      "idregra": 12,
+      "nome": "Queda no envio de dados - Estação solarimétrica",
+      "tipo": 0,
+      "valoralerta": 1,
+      "valorfalha": 10
+    },
+    {
+      "idregra": 15,
+      "nome": "Queda no envio de dados - Medidor",
+      "tipo": 0,
+      "valoralerta": 1,
+      "valorfalha": 10
+    }
+  ],
+  "regrasticketsautomaticos": [],
+  "rendimento_anual": null,
+  "rendimento_mensal": null,
+  "situacao": 1,
+  "status_usina": 2,
+  "success": true,
+  "temLayout": false,
+  "ticket_open": false,
+  "ticketautomatico": null,
+  "ticketsabertos": null,
+  "ticketstatus": [
+    null
+  ],
+  "trackersdetails": null,
+  "ultimaleitura": "Mon, 13 Jul 2026 22:41:05 GMT",
+  "urlimg": null,
+  "yield_day": 5.04,
+  "yield_mes": 44.63
+}

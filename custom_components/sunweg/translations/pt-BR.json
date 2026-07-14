@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar ao SunWEG",
+        "description": "Entre com a conta que você usa no sun.weg.net.",
+        "data": {
+          "username": "E-mail",
+          "password": "Senha"
+        }
+      },
+      "plants": {
+        "title": "Escolher usinas",
+        "description": "Selecione as usinas a monitorar e com que frequência consultar a nuvem SunWEG. Os inversores enviam uma nova leitura a cada 6 minutos, aproximadamente, então consultar com mais frequência não traz dados mais recentes.",
+        "data": {
+          "plants": "Usinas",
+          "scan_interval": "Intervalo de atualização"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Autenticar novamente no SunWEG",
+        "description": "A senha de {username} foi recusada. Digite-a novamente.",
+        "data": {
+          "password": "Senha"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Falha ao conectar ao SunWEG.",
+      "invalid_auth": "E-mail ou senha inválidos.",
+      "unknown": "Erro inesperado."
+    },
+    "abort": {
+      "already_configured": "Esta conta SunWEG já está configurada.",
+      "no_plants": "Esta conta não possui usinas.",
+      "reauth_successful": "Autenticação renovada com sucesso."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opções do SunWEG",
+        "description": "Os inversores enviam uma nova leitura a cada 6 minutos, aproximadamente, então consultar com mais frequência não traz dados mais recentes.",
+        "data": {
+          "plants": "Usinas",
+          "scan_interval": "Intervalo de atualização"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Não foi possível contatar o SunWEG para atualizar a lista de usinas. Apenas as usinas já configuradas são exibidas."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "power": { "name": "Potência" },
+      "energy_today": { "name": "Energia hoje" },
+      "energy_total": { "name": "Energia total" },
+      "energy_month": { "name": "Energia no mês" },
+      "energy_year": { "name": "Energia no ano" },
+      "co2_avoided": { "name": "CO2 evitado" },
+      "last_update": { "name": "Última atualização" },
+      "last_reading": { "name": "Última leitura" },
+      "temperature": { "name": "Temperatura" },
+      "frequency": { "name": "Frequência da rede" },
+      "power_factor": { "name": "Fator de potência" },
+      "voltage_phase_a": { "name": "Tensão fase A" },
+      "voltage_phase_b": { "name": "Tensão fase B" },
+      "voltage_phase_c": { "name": "Tensão fase C" },
+      "current_phase_a": { "name": "Corrente fase A" },
+      "current_phase_b": { "name": "Corrente fase B" },
+      "current_phase_c": { "name": "Corrente fase C" },
+      "mppt_voltage": { "name": "Tensão MPPT {index}" },
+      "mppt_current": { "name": "Corrente MPPT {index}" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Online" }
+    }
+  }
+}

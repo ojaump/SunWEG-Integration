@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to SunWEG",
+        "description": "Sign in with the account you use on sun.weg.net.",
+        "data": {
+          "username": "Email",
+          "password": "Password"
+        }
+      },
+      "plants": {
+        "title": "Choose plants",
+        "description": "Select the plants to monitor and how often to poll the SunWEG cloud. The inverters push a new reading roughly every 6 minutes, so polling faster than that will not produce fresher data.",
+        "data": {
+          "plants": "Plants",
+          "scan_interval": "Update interval"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate SunWEG",
+        "description": "The password for {username} was rejected. Enter it again.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to SunWEG.",
+      "invalid_auth": "Invalid email or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This SunWEG account is already configured.",
+      "no_plants": "This account has no plants.",
+      "reauth_successful": "Re-authentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "SunWEG options",
+        "description": "The inverters push a new reading roughly every 6 minutes, so polling faster than that will not produce fresher data.",
+        "data": {
+          "plants": "Plants",
+          "scan_interval": "Update interval"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach SunWEG to refresh the plant list. Only the plants already configured are shown."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "power": { "name": "Power" },
+      "energy_today": { "name": "Energy today" },
+      "energy_total": { "name": "Total energy" },
+      "energy_month": { "name": "Energy this month" },
+      "energy_year": { "name": "Energy this year" },
+      "co2_avoided": { "name": "CO2 avoided" },
+      "last_update": { "name": "Last update" },
+      "last_reading": { "name": "Last reading" },
+      "temperature": { "name": "Temperature" },
+      "frequency": { "name": "Grid frequency" },
+      "power_factor": { "name": "Power factor" },
+      "voltage_phase_a": { "name": "Voltage phase A" },
+      "voltage_phase_b": { "name": "Voltage phase B" },
+      "voltage_phase_c": { "name": "Voltage phase C" },
+      "current_phase_a": { "name": "Current phase A" },
+      "current_phase_b": { "name": "Current phase B" },
+      "current_phase_c": { "name": "Current phase C" },
+      "mppt_voltage": { "name": "MPPT {index} voltage" },
+      "mppt_current": { "name": "MPPT {index} current" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Online" }
+    }
+  }
+}
