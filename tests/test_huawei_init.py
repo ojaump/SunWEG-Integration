@@ -18,7 +18,10 @@ from custom_components.sunweg.const import (
     DOMAIN,
     PROVIDER_HUAWEI,
 )
-from custom_components.sunweg.huawei.api import FusionSolarAuthError
+from custom_components.sunweg.huawei.api import (
+    FusionSolarAuthError,
+    FusionSolarConnectionError,
+)
 from custom_components.sunweg.huawei.const import (
     CONF_FLOW_INTERVAL,
     CONF_HOST,
@@ -63,7 +66,9 @@ def mock_api():
     coordinators and the entities -- runs for real.
     """
 
-    async def _request(self, method: str, path: str, **kwargs: Any) -> dict:
+    async def _request(self, method: str, path: str, **kwargs: Any) -> Any:
+        if "livedata/v1/support" in path:
+            return True
         if "station-detail" in path:
             return _load("station_detail")
         if "energyflow-live" in path:
@@ -91,6 +96,13 @@ def mock_api():
         "custom_components.sunweg.huawei.api.FusionSolarClient._request", _request
     ) as mocked:
         yield mocked
+
+
+def _patch_request(handler):
+    """Swap in a request handler that wraps the recorded one."""
+    return patch(
+        "custom_components.sunweg.huawei.api.FusionSolarClient._request", handler
+    )
 
 
 async def test_setup_creates_devices_and_entities(
@@ -177,3 +189,85 @@ async def test_rejected_session_triggers_reauth(hass: HomeAssistant) -> None:
         if flow["context"]["source"] == "reauth"
     ]
     assert flows and flows[0]["step_id"] == "reauth_confirm"
+
+
+async def test_plant_without_live_data_still_loads(
+    hass: HomeAssistant, mock_api
+) -> None:
+    """A plant the cloud will not subscribe to is read from its cache instead.
+
+    Many plants report `support: false`; the portal simply never subscribes for
+    them. Doing so anyway is rejected, and used to fail the whole entry.
+    """
+    inner = mock_api
+    calls: list[str] = []
+
+    async def _request(self, method: str, path: str, **kwargs: Any) -> Any:
+        calls.append(path)
+        if "livedata/v1/support" in path:
+            return False
+        return await inner(self, method, path, **kwargs)
+
+    entry = _entry()
+    entry.add_to_hass(hass)
+    with _patch_request(_request):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state.name == "LOADED"
+    assert not [path for path in calls if path.endswith("v1/subscribe")]
+    # The flow is served from the cloud's cache, so the sensors still exist.
+    assert hass.states.get("sensor.plant_a_pv_power").state == "45.796"
+    # And the capability is asked about once, not on every fast poll.
+    assert len([path for path in calls if "v1/support" in path]) == 1
+
+
+async def test_rejected_subscription_does_not_fail_setup(
+    hass: HomeAssistant, mock_api
+) -> None:
+    """The cloud answering 526 to a subscribe costs freshness, not the entry."""
+    inner = mock_api
+
+    async def _request(self, method: str, path: str, **kwargs: Any) -> Any:
+        if path.endswith("v1/subscribe"):
+            raise FusionSolarConnectionError(
+                "Request to /rest/dp/pvms/livedata/v1/subscribe failed: 526"
+            )
+        return await inner(self, method, path, **kwargs)
+
+    entry = _entry()
+    entry.add_to_hass(hass)
+    with _patch_request(_request):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state.name == "LOADED"
+    assert hass.states.get("sensor.plant_a_pv_power").state == "45.796"
+
+
+async def test_one_broken_plant_does_not_sink_the_others(
+    hass: HomeAssistant, mock_api
+) -> None:
+    """A plant the cloud will not answer for is skipped, not fatal."""
+    inner = mock_api
+    broken = "NE=99999999"
+
+    async def _request(self, method: str, path: str, **kwargs: Any) -> Any:
+        target = kwargs.get("params", {}).get("stationDn") or kwargs.get(
+            "json", {}
+        ).get("domainDn")
+        if target == broken:
+            raise FusionSolarConnectionError(f"Request to {path} failed: 500")
+        return await inner(self, method, path, **kwargs)
+
+    entry = _entry()
+    entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        entry, options={**entry.options, CONF_PLANTS: [PLANT_DN, broken]}
+    )
+    with _patch_request(_request):
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state.name == "LOADED"
+    assert hass.states.get("sensor.plant_a_power") is not None

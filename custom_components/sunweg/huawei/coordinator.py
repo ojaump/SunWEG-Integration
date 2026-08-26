@@ -67,18 +67,35 @@ class _BaseCoordinator[T](DataUpdateCoordinator[dict[str, T]]):
         raise NotImplementedError
 
     async def _async_update_data(self) -> dict[str, T]:
-        """Fetch every selected plant, in parallel."""
-        try:
-            results = await asyncio.gather(
-                *(self._async_fetch(dn) for dn in self.plant_dns)
-            )
-        except FusionSolarAuthError as err:
-            # Triggers the reauth flow rather than just marking the entry failed.
-            raise ConfigEntryAuthFailed(str(err)) from err
-        except FusionSolarError as err:
-            raise UpdateFailed(str(err)) from err
+        """Fetch every selected plant, in parallel.
 
-        return dict(zip(self.plant_dns, results, strict=True))
+        Plants fail independently -- one that the cloud will not answer for
+        must not take the rest of the account down with it.
+        """
+        results = await asyncio.gather(
+            *(self._async_fetch(dn) for dn in self.plant_dns),
+            return_exceptions=True,
+        )
+
+        data: dict[str, T] = {}
+        failures: list[str] = []
+        for station_dn, result in zip(self.plant_dns, results, strict=True):
+            if isinstance(result, FusionSolarAuthError):
+                # Triggers the reauth flow rather than just marking the entry
+                # failed. The session is shared, so one is enough.
+                raise ConfigEntryAuthFailed(str(result)) from result
+            if isinstance(result, FusionSolarError):
+                failures.append(f"{station_dn}: {result}")
+                continue
+            if isinstance(result, BaseException):
+                raise result
+            data[station_dn] = result
+
+        if failures and not data:
+            raise UpdateFailed("; ".join(failures))
+        for failure in failures:
+            _LOGGER.warning("%s could not be read: %s", self.name, failure)
+        return data
 
 
 class FusionSolarPlantCoordinator(_BaseCoordinator[Plant]):

@@ -24,6 +24,10 @@ _NO_DATA = -9.9999999e7
 # Session expired server-side; the body says so with HTTP 200.
 _RELOGIN_CODE = 305
 
+# How long to leave a plant alone after its subscription attempt failed, so a
+# fast flow interval does not retry a broken endpoint every few seconds.
+_SUBSCRIBE_RETRY = 300
+
 
 class FusionSolarError(Exception):
     """Base error for the FusionSolar API."""
@@ -270,6 +274,7 @@ class FusionSolarClient:
         # Device metadata never changes; the subscription does, on a timer.
         self._device_info: dict[str, dict[str, Any]] = {}
         self._devices: dict[str, dict[int, list[str]]] = {}
+        self._live_data: dict[str, bool] = {}
         self._subscribed_until: dict[str, float] = {}
 
     async def login(self) -> None:
@@ -355,8 +360,12 @@ class FusionSolarClient:
                 return
             await self.login()
 
-    async def _request(self, method: str, path: str, **kwargs: Any) -> dict[str, Any]:
-        """Perform an authenticated call, logging in again if the session died."""
+    async def _request(self, method: str, path: str, **kwargs: Any) -> Any:
+        """Perform an authenticated call, logging in again if the session died.
+
+        The JSON is returned as-is: most endpoints answer with an object, but
+        some answer with a bare boolean or an array.
+        """
         if self._roarand is None:
             await self._async_relogin(None)
 
@@ -371,14 +380,15 @@ class FusionSolarClient:
                     **kwargs,
                 ) as response:
                     expired = response.status in (401, 403)
-                    data: dict[str, Any] = {}
+                    data: Any = {}
                     if not expired:
                         response.raise_for_status()
                         data = await response.json(content_type=None)
-                        expired = _RELOGIN_CODE in (
-                            data.get("code"),
-                            data.get("failCode"),
-                        )
+                        if isinstance(data, dict):
+                            expired = _RELOGIN_CODE in (
+                                data.get("code"),
+                                data.get("failCode"),
+                            )
                     if expired:
                         if attempt == 1:
                             _LOGGER.debug(
@@ -447,15 +457,48 @@ class FusionSolarClient:
             self._devices[station_dn] = devices
         return flow
 
+    async def _async_supports_live_data(self, station_dn: str) -> bool:
+        """Whether the plant can be subscribed to at all.
+
+        Plenty of plants cannot -- the portal checks this before it subscribes,
+        and subscribing anyway is rejected. It is a capability, so ask once.
+        """
+        if station_dn not in self._live_data:
+            self._live_data[station_dn] = (
+                await self._request(
+                    "GET",
+                    "/rest/dp/pvms/livedata/v1/support",
+                    params={"domainDn": station_dn, "featureId": 1},
+                )
+                is True
+            )
+        return self._live_data[station_dn]
+
     async def _async_subscribe(self, station_dn: str) -> None:
-        """Renew the plant's live-data subscription shortly before it lapses."""
+        """Renew the plant's live-data subscription shortly before it lapses.
+
+        Best effort throughout: the subscription only makes the cloud refresh
+        the plant faster, so losing it costs freshness, not data, and must
+        never take the whole entry down with it.
+        """
         if time.monotonic() < self._subscribed_until.get(station_dn, 0.0):
             return
-        data = await self._request(
-            "POST",
-            "/rest/dp/pvms/livedata/v1/subscribe",
-            json={"domainDn": station_dn, "featureId": 1},
-        )
+
+        try:
+            if not await self._async_supports_live_data(station_dn):
+                # Never expires, so this is asked once and then left alone.
+                self._subscribed_until[station_dn] = float("inf")
+                return
+            data = await self._request(
+                "POST",
+                "/rest/dp/pvms/livedata/v1/subscribe",
+                json={"domainDn": station_dn, "featureId": 1},
+            )
+        except FusionSolarConnectionError as err:
+            _LOGGER.debug("Live data unavailable for %s: %s", station_dn, err)
+            self._subscribed_until[station_dn] = time.monotonic() + _SUBSCRIBE_RETRY
+            return
+
         remaining = _as_float((data.get("subscribeInfo") or {}).get("remainTime")) or 60
         # Renew early: a lapsed subscription silently falls back to stale data.
         self._subscribed_until[station_dn] = time.monotonic() + remaining * 0.5
@@ -483,7 +526,16 @@ class FusionSolarClient:
         whole device tree, and the fast poll keeps this cache warm anyway.
         """
         if station_dn not in self._devices:
-            await self.async_get_energy_flow(station_dn)
+            try:
+                await self.async_get_energy_flow(station_dn)
+            except FusionSolarConnectionError as err:
+                # The plant's own KPIs are still worth having, so report the
+                # plant with no devices rather than failing it outright.
+                _LOGGER.warning(
+                    "Cannot list the devices of %s, its energy flow is unavailable: %s",
+                    station_dn,
+                    err,
+                )
         devices = self._devices.get(station_dn, {})
         return [dn for moc in (MOC_INVERTER, MOC_METER) for dn in devices.get(moc, [])]
 
