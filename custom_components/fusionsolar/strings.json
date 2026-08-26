@@ -1,0 +1,111 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to FusionSolar",
+        "description": "Sign in with the account you use on the FusionSolar web portal. The server address must be the regional one your account lives on, the same host your browser shows when you are signed in.",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "host": "Server"
+        }
+      },
+      "plants": {
+        "title": "Choose plants",
+        "description": "Select the plants to monitor. Plant KPIs and device signals are recomputed in the cloud every few minutes; the energy flow is polled separately and much faster, because the integration holds a live-data subscription for it.",
+        "data": {
+          "plants": "Plants",
+          "scan_interval": "Update interval",
+          "flow_interval": "Energy flow interval"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate FusionSolar",
+        "description": "The password for {username} was rejected. Enter it again.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to FusionSolar.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This FusionSolar account is already configured.",
+      "no_plants": "This account has no plants.",
+      "reauth_successful": "Re-authentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "FusionSolar options",
+        "description": "The energy flow is polled on its own, faster interval; everything else follows the update interval.",
+        "data": {
+          "plants": "Plants",
+          "scan_interval": "Update interval",
+          "flow_interval": "Energy flow interval"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach FusionSolar to refresh the plant list. Only the plants already configured are shown."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "power": { "name": "Power" },
+      "capacity": { "name": "Installed capacity" },
+      "energy_today": { "name": "Energy today" },
+      "energy_total": { "name": "Total energy" },
+      "energy_month": { "name": "Energy this month" },
+      "energy_year": { "name": "Energy this year" },
+      "energy_used_today": { "name": "Energy used today" },
+      "energy_self_used_today": { "name": "Self-used energy today" },
+      "co2_avoided": { "name": "CO2 avoided" },
+      "last_update": { "name": "Last update" },
+      "last_reading": { "name": "Last reading" },
+      "pv_power": { "name": "PV power" },
+      "inverter_power": { "name": "Inverter power" },
+      "load_power": { "name": "Load power" },
+      "grid_power": { "name": "Grid power" },
+      "grid_import_power": { "name": "Grid import power" },
+      "grid_export_power": { "name": "Grid export power" },
+      "battery_charge_power": { "name": "Battery charge power" },
+      "battery_discharge_power": { "name": "Battery discharge power" },
+      "active_power": { "name": "Active power" },
+      "reactive_power": { "name": "Reactive power" },
+      "apparent_power": { "name": "Apparent power" },
+      "active_power_phase_a": { "name": "Active power phase A" },
+      "active_power_phase_b": { "name": "Active power phase B" },
+      "active_power_phase_c": { "name": "Active power phase C" },
+      "energy_import": { "name": "Imported energy" },
+      "energy_export": { "name": "Exported energy" },
+      "reactive_energy_import": { "name": "Imported reactive energy" },
+      "reactive_energy_export": { "name": "Exported reactive energy" },
+      "grid_frequency": { "name": "Grid frequency" },
+      "temperature": { "name": "Internal temperature" },
+      "power_factor": { "name": "Power factor" },
+      "insulation_resistance": { "name": "Insulation resistance" },
+      "rated_power": { "name": "Rated power" },
+      "startup_time": { "name": "Startup time" },
+      "shutdown_time": { "name": "Shutdown time" },
+      "inverter_state": { "name": "State" },
+      "meter_state": { "name": "State" },
+      "voltage_phase_a": { "name": "Voltage phase A" },
+      "voltage_phase_b": { "name": "Voltage phase B" },
+      "voltage_phase_c": { "name": "Voltage phase C" },
+      "voltage_line_ab": { "name": "Line voltage AB" },
+      "voltage_line_bc": { "name": "Line voltage BC" },
+      "voltage_line_ca": { "name": "Line voltage CA" },
+      "current_phase_a": { "name": "Current phase A" },
+      "current_phase_b": { "name": "Current phase B" },
+      "current_phase_c": { "name": "Current phase C" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Online" }
+    }
+  }
+}

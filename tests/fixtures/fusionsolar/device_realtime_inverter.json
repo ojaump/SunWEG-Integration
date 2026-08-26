@@ -1,0 +1,187 @@
+{
+ "buildCode": "2",
+ "data": [
+  {
+   "status": 1
+  },
+  {
+   "groupName": "Outro",
+   "signals": [
+    {
+     "id": 10025,
+     "latestTime": 1787769605,
+     "name": "Estado do inversor",
+     "realValue": "512",
+     "unit": "",
+     "value": "Liga\u00e7\u00e3o \u00e0 rede"
+    },
+    {
+     "id": 10032,
+     "latestTime": 1787769605,
+     "name": "Capacidade de gera\u00e7\u00e3o do dia corrente",
+     "realValue": "65.35",
+     "unit": "kWh",
+     "value": "65.35"
+    },
+    {
+     "id": 10029,
+     "latestTime": 1787769605,
+     "name": "Rendimento total",
+     "realValue": "156051.88",
+     "unit": "kWh",
+     "value": "156051.88"
+    },
+    {
+     "id": 10018,
+     "latestTime": 1787769605,
+     "name": "Pot\u00eancia ativa",
+     "realValue": "11.304",
+     "unit": "kW",
+     "value": "11.304"
+    },
+    {
+     "id": 10019,
+     "latestTime": 1787769605,
+     "name": "Pot\u00eancia reativa de sa\u00edda",
+     "realValue": "0.003",
+     "unit": "kvar",
+     "value": "0.003"
+    },
+    {
+     "id": 10006,
+     "latestTime": 1787768992,
+     "name": "Capacidade nominal do inversor",
+     "realValue": "36.000",
+     "unit": "kW",
+     "value": "36.000"
+    },
+    {
+     "id": 10020,
+     "latestTime": 1787769605,
+     "name": "Fator de pot\u00eancia",
+     "realValue": "0.997",
+     "unit": "",
+     "value": "0.997"
+    },
+    {
+     "id": 10021,
+     "latestTime": 1787769605,
+     "name": "Frequ\u00eancia da rede",
+     "realValue": "60.01",
+     "unit": "Hz",
+     "value": "60.01"
+    },
+    {
+     "id": 21029,
+     "latestTime": 1787768992,
+     "name": "Modo de sa\u00edda",
+     "realValue": "1",
+     "unit": "",
+     "value": "Sistema trif\u00e1sico com tr\u00eas fios"
+    },
+    {
+     "id": 10014,
+     "latestTime": 1787769605,
+     "name": "Corrente da fase A da rede",
+     "realValue": "16.573",
+     "unit": "A",
+     "value": "16.573"
+    },
+    {
+     "id": 10015,
+     "latestTime": 1787769605,
+     "name": "Corrente da fase B da rede",
+     "realValue": "16.553",
+     "unit": "A",
+     "value": "16.553"
+    },
+    {
+     "id": 10016,
+     "latestTime": 1787769605,
+     "name": "Corrente da fase C da rede",
+     "realValue": "16.602",
+     "unit": "A",
+     "value": "16.602"
+    },
+    {
+     "id": 10008,
+     "latestTime": 1787769605,
+     "name": "Tens\u00e3o de AB da rede",
+     "realValue": "392.7",
+     "unit": "V",
+     "value": "392.7"
+    },
+    {
+     "id": 10009,
+     "latestTime": 1787769605,
+     "name": "Tens\u00e3o de BC da rede",
+     "realValue": "394.8",
+     "unit": "V",
+     "value": "394.8"
+    },
+    {
+     "id": 10010,
+     "latestTime": 1787769605,
+     "name": "Tens\u00e3o de CA da rede",
+     "realValue": "395.0",
+     "unit": "V",
+     "value": "395.0"
+    },
+    {
+     "id": 10027,
+     "latestTime": 1787768992,
+     "name": "Tempo de liga\u00e7\u00e3o do inversor",
+     "realValue": "2026-08-26 07:06:53",
+     "unit": "",
+     "value": "2026-08-26 07:06:53"
+    },
+    {
+     "id": 10028,
+     "latestTime": 1787768992,
+     "name": "Tempo de desliga\u00e7\u00e3o do inversor",
+     "realValue": "2026-08-25 18:28:13",
+     "unit": "",
+     "value": "2026-08-25 18:28:13"
+    },
+    {
+     "id": 10023,
+     "latestTime": 1787769605,
+     "name": "Temperatura interna",
+     "realValue": "37.7",
+     "unit": "\u2103",
+     "value": "37.7"
+    },
+    {
+     "id": 10024,
+     "latestTime": 1787769605,
+     "name": "Resist\u00eancia de isolamento",
+     "realValue": "4.962",
+     "unit": "M\u03a9",
+     "value": "4.962"
+    },
+    {
+     "id": 230223000,
+     "latestTime": 1787768992,
+     "name": "Status de ajuste de pot\u00eancia ativa",
+     "realValue": "P=40.000kW (Redu\u00e7\u00e3o de pot\u00eancia ativa por valor fixo)",
+     "unit": "",
+     "value": "P=40.000kW (Redu\u00e7\u00e3o de pot\u00eancia ativa por valor fixo)"
+    },
+    {
+     "id": 230223001,
+     "latestTime": 1787768992,
+     "name": "Status de ajuste de pot\u00eancia reativa",
+     "realValue": "PF=1.000 (Fator de pot\u00eancia)",
+     "unit": "",
+     "value": "PF=1.000 (Fator de pot\u00eancia)"
+    }
+   ]
+  },
+  {
+   "pv2mppt": false
+  }
+ ],
+ "failCode": 0,
+ "params": [],
+ "success": true
+}

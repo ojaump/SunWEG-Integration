@@ -5,3 +5,6 @@ venv/
 .venv/
 
 .ruff_cache/
+
+# HAR captures carry live session cookies and the password in plaintext.
+*.har

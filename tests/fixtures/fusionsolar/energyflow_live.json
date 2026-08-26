@@ -1,0 +1,251 @@
+{
+ "data": {
+  "pvStoreRemainingTime": "",
+  "sceneType": 2,
+  "flow": {
+   "nodes": [
+    {
+     "deviceTips": {
+      "SHOW_SUBSYSTEM": true
+     },
+     "iconHeight": 57.0,
+     "iconWidth": 60.0,
+     "display": "CONNECTED",
+     "column": 1.0,
+     "icon": "images/main/singlePlant/energyFlow/singleSi.png",
+     "description": {
+      "offset": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "label": "neteco.pvms.devTypeLangKey.string",
+      "value": "45.796 kW",
+      "labelColor": "#333333",
+      "valueColor": "#19CE96"
+     },
+     "nodeStatus": "CONNECTED",
+     "mocId": 20812,
+     "customAttr": {
+      "optNum": 0
+     },
+     "name": "neteco.pvms.devTypeLangKey.string",
+     "id": "0",
+     "row": 1.0,
+     "render": "",
+     "value": 45.796
+    },
+    {
+     "iconHeight": 64.0,
+     "iconWidth": 64.0,
+     "display": "CONNECTED",
+     "column": 2.1,
+     "icon": "images/main/singlePlant/energyFlow/ic_invert_on.png",
+     "description": {
+      "offset": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "label": "neteco.pvms.devTypeLangKey.inverter",
+      "value": "",
+      "labelColor": "#333333",
+      "valueColor": "#19CE96"
+     },
+     "devIds": [
+      "NE=34597658",
+      "NE=34597659",
+      "NE=34597660",
+      "NE=35928450",
+      "NE=53441226"
+     ],
+     "nodeStatus": "CONNECTED",
+     "mocId": 20822,
+     "customAttr": {
+      "10025": false
+     },
+     "name": "neteco.pvms.devTypeLangKey.inverter",
+     "id": "1",
+     "row": 1.0,
+     "render": ""
+    },
+    {
+     "iconHeight": 58.0,
+     "iconWidth": 46.0,
+     "display": "CONNECTED",
+     "column": 5.0,
+     "icon": "images/main/singlePlant/energyFlow/meter.png",
+     "description": {
+      "offset": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "label": "neteco.pvms.devTypeLangKey.meter",
+      "value": "",
+      "labelColor": "#333333",
+      "valueColor": "#19CE96"
+     },
+     "devIds": [
+      "NE=55898110",
+      "NE=55898136"
+     ],
+     "nodeStatus": "CONNECTED",
+     "mocId": 20816,
+     "name": "neteco.pvms.devTypeLangKey.meter",
+     "id": "2",
+     "row": 1.0,
+     "render": ""
+    },
+    {
+     "iconHeight": 84.0,
+     "iconWidth": 79.0,
+     "display": "CONNECTED",
+     "column": 7.0,
+     "icon": "images/main/singlePlant/energyFlow/grid.png",
+     "name": "neteco.pvms.partials.main.dm.detailInfo.curInfo.grid",
+     "description": {
+      "offset": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "label": "neteco.pvms.partials.main.dm.detailInfo.curInfo.grid",
+      "value": "",
+      "labelColor": "#333333",
+      "valueColor": "#999999"
+     },
+     "id": "3",
+     "row": 1.0,
+     "nodeStatus": "CONNECTED",
+     "render": "",
+     "mocId": 90001
+    },
+    {
+     "iconHeight": 45.0,
+     "iconWidth": 45.0,
+     "display": "CONNECTED",
+     "column": 3.6,
+     "icon": "images/main/singlePlant/energyFlow/householdElectricity.png",
+     "description": {
+      "offset": {
+       "x": 0.0,
+       "y": 0.0
+      },
+      "label": "neteco.pvms.KPI.kpiView.electricalLoad",
+      "value": "88.108 kW",
+      "labelColor": "#333333",
+      "valueColor": "#19CE96"
+     },
+     "nodeStatus": "CONNECTED",
+     "mocId": 90002,
+     "name": "neteco.pvms.KPI.kpiView.electricalLoad",
+     "extendTips": {},
+     "id": "5",
+     "row": 2.0,
+     "render": "",
+     "value": 88.108
+    }
+   ],
+   "links": [
+    {
+     "arrowColor": "#19CE88",
+     "fromNode": "0",
+     "visible": true,
+     "merge": true,
+     "toConnector": "L21",
+     "description": {
+      "offset": {},
+      "label": "",
+      "value": "",
+      "labelColor": "",
+      "valueColor": ""
+     },
+     "fromConnector": "R21",
+     "id": "0",
+     "linkColor": "#7CC3FF",
+     "flowing": "FORWARD",
+     "toNode": "1"
+    },
+    {
+     "arrowColor": "#19CE88",
+     "fromNode": "1",
+     "visible": true,
+     "merge": true,
+     "toConnector": "L21",
+     "description": {
+      "offset": {
+       "x": -135.0
+      },
+      "label": "neteco.pvms.energy.flow.input.power",
+      "value": "45.796 kW",
+      "labelColor": "",
+      "valueColor": ""
+     },
+     "fromConnector": "R21",
+     "id": "1",
+     "linkColor": "#7CC3FF",
+     "flowing": "NONE",
+     "toNode": "2"
+    },
+    {
+     "arrowColor": "#19CE88",
+     "fromNode": "1",
+     "visible": true,
+     "merge": true,
+     "toConnector": "T21",
+     "description": {
+      "offset": {},
+      "label": "",
+      "value": "",
+      "labelColor": "",
+      "valueColor": ""
+     },
+     "fromConnector": "R22",
+     "id": "3",
+     "linkColor": "#7CC3FF",
+     "flowing": "FORWARD",
+     "toNode": "5",
+     "direction": "left"
+    },
+    {
+     "arrowColor": "#19CE88",
+     "fromNode": "2",
+     "visible": true,
+     "merge": true,
+     "toConnector": "T22",
+     "description": {
+      "offset": {},
+      "label": "",
+      "value": "",
+      "labelColor": "",
+      "valueColor": ""
+     },
+     "fromConnector": "L22",
+     "id": "4",
+     "linkColor": "#7CC3FF",
+     "flowing": "FORWARD",
+     "toNode": "5",
+     "direction": "right"
+    },
+    {
+     "arrowColor": "#19CE88",
+     "fromNode": "3",
+     "visible": true,
+     "merge": true,
+     "toConnector": "L11",
+     "description": {
+      "offset": {},
+      "label": "neteco.pvms.energy.flow.buy.power",
+      "value": "42.312 kW",
+      "labelColor": "",
+      "valueColor": ""
+     },
+     "fromConnector": "R11",
+     "id": "5",
+     "linkColor": "#7CC3FF",
+     "flowing": "FORWARD",
+     "toNode": "2"
+    }
+   ]
+  }
+ },
+ "success": true,
+ "failCode": 0
+}

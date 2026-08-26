@@ -1,0 +1,12 @@
+{
+  "domain": "fusionsolar",
+  "name": "FusionSolar",
+  "codeowners": ["@ojaump"],
+  "config_flow": true,
+  "documentation": "https://github.com/ojaump/SunWEG-Integration",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/ojaump/SunWEG-Integration/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

@@ -1,0 +1,25 @@
+{
+ "code": 0,
+ "data": {
+  "dnId": 9522342,
+  "dn": "NE=34597658",
+  "agentDn": null,
+  "name": "Inverter 1",
+  "originName": "INV-REDACTED",
+  "typeId": 23022,
+  "versionId": 30003,
+  "mocId": 20822,
+  "parentDn": "NE=34597656",
+  "parentDnId": 9522340,
+  "iconPath": "/netecomodelmgr/images/UniPicture/16/20822.png",
+  "createTime": 1729882795,
+  "status": "Connected",
+  "meType": "{STRI}String_Inverter_Huawei_SUN2000_HWMODBUS",
+  "solutionMocId": 20822,
+  "bindTypeId": 23022,
+  "protocolType": "HWMODBUS",
+  "visible": true,
+  "timeZone": "Brazil/East",
+  "extendedAttrs": {}
+ }
+}
