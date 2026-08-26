@@ -12,12 +12,8 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import Plant, SunWegAuthError, SunWegClient, SunWegError
-from .const import (
-    CONF_PLANTS,
-    CONF_SCAN_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
-    DOMAIN,
-)
+from ..const import CONF_PLANTS, CONF_SCAN_INTERVAL, DOMAIN
+from .const import DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -30,7 +30,7 @@ def mock_api():
     the entities -- runs for real.
     """
     with patch(
-        "custom_components.sunweg.api.SunWegClient._request",
+        "custom_components.sunweg.weg.api.SunWegClient._request",
         return_value=PLANT_FIXTURE,
     ) as mocked:
         yield mocked

@@ -7,7 +7,8 @@ from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Device, Plant
-from .const import DOMAIN, MANUFACTURER
+from ..const import DOMAIN
+from .const import MANUFACTURER
 from .coordinator import FusionSolarFlowCoordinator, FusionSolarPlantCoordinator
 
 

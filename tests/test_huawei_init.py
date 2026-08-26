@@ -11,19 +11,23 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.fusionsolar.api import FusionSolarAuthError
-from custom_components.fusionsolar.const import (
+from custom_components.sunweg.const import (
+    CONF_PLANTS,
+    CONF_PROVIDER,
+    CONF_SCAN_INTERVAL,
+    DOMAIN,
+    PROVIDER_HUAWEI,
+)
+from custom_components.sunweg.huawei.api import FusionSolarAuthError
+from custom_components.sunweg.huawei.const import (
     CONF_FLOW_INTERVAL,
     CONF_HOST,
-    CONF_PLANTS,
-    CONF_SCAN_INTERVAL,
     DEFAULT_HOST,
-    DOMAIN,
     MOC_INVERTER,
     MOC_METER,
 )
 
-FIXTURES = Path(__file__).parent / "fixtures" / "fusionsolar"
+FIXTURES = Path(__file__).parent / "fixtures" / "huawei"
 PLANT_DN = "NE=34597654"
 METER_DNS = ("NE=55898110", "NE=55898136")
 
@@ -37,6 +41,7 @@ def _entry() -> MockConfigEntry:
         domain=DOMAIN,
         title="user",
         data={
+            CONF_PROVIDER: PROVIDER_HUAWEI,
             CONF_HOST: DEFAULT_HOST,
             CONF_USERNAME: "user",
             CONF_PASSWORD: "secret",
@@ -83,7 +88,7 @@ def mock_api():
         raise AssertionError(f"unexpected request to {path}")
 
     with patch(
-        "custom_components.fusionsolar.api.FusionSolarClient._request", _request
+        "custom_components.sunweg.huawei.api.FusionSolarClient._request", _request
     ) as mocked:
         yield mocked
 
@@ -159,7 +164,7 @@ async def test_rejected_session_triggers_reauth(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "custom_components.fusionsolar.api.FusionSolarClient._request",
+        "custom_components.sunweg.huawei.api.FusionSolarClient._request",
         side_effect=FusionSolarAuthError("Session rejected"),
     ):
         await hass.config_entries.async_setup(entry.entry_id)

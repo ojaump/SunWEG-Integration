@@ -7,7 +7,8 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .api import Inverter, Plant
-from .const import DOMAIN, MANUFACTURER
+from ..const import DOMAIN
+from .const import MANUFACTURER
 from .coordinator import SunWegCoordinator
 
 

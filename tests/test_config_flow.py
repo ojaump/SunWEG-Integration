@@ -1,6 +1,5 @@
-"""Tests for the SunWEG config flow."""
+"""Tests for the SunWEG / FusionSolar config flow."""
 
-from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from homeassistant.config_entries import SOURCE_USER
@@ -9,42 +8,71 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.sunweg.api import SunWegAuthError, SunWegConnectionError
-from custom_components.sunweg.const import CONF_PLANTS, CONF_SCAN_INTERVAL, DOMAIN
+from custom_components.sunweg.const import (
+    CONF_PLANTS,
+    CONF_PROVIDER,
+    CONF_SCAN_INTERVAL,
+    DOMAIN,
+    PROVIDER_HUAWEI,
+    PROVIDER_WEG,
+)
+from custom_components.sunweg.huawei.api import FusionSolarAuthError
+from custom_components.sunweg.huawei.const import (
+    CONF_FLOW_INTERVAL,
+    CONF_HOST,
+    DEFAULT_HOST,
+)
+from custom_components.sunweg.weg.api import SunWegAuthError, SunWegConnectionError
 
 from .conftest import PLANT_ID
 
-PLANTS = {33264: "Terminação", 36146: "Granja 02", PLANT_ID: "Granja 03 - 100KW"}
+PLANTS = {"33264": "Terminação", "36146": "Granja 02", str(PLANT_ID): "Granja 03"}
 CREDS = {CONF_USERNAME: "user@example.com", CONF_PASSWORD: "secret"}
+HUAWEI_CREDS = {
+    CONF_USERNAME: "user",
+    CONF_PASSWORD: "secret",
+    CONF_HOST: DEFAULT_HOST,
+}
 
 
-def _patch_client(**kwargs):
+def _patch_client(unique_id="15510", **kwargs):
     """Patch out the login + plant listing the flow performs."""
     return patch(
         "custom_components.sunweg.config_flow._async_authenticate",
-        new=AsyncMock(return_value=(SimpleNamespace(user_id=15510), PLANTS), **kwargs),
+        new=AsyncMock(return_value=(unique_id, PLANTS), **kwargs),
     )
 
 
-async def test_full_flow(hass: HomeAssistant) -> None:
-    """Credentials, then plant selection, produce an entry."""
+async def _pick(hass: HomeAssistant, provider: str) -> dict:
+    """Start the flow and choose a provider from the menu."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": SOURCE_USER}
     )
+    assert result["type"] is FlowResultType.MENU
+    assert result["menu_options"] == [PROVIDER_WEG, PROVIDER_HUAWEI]
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": provider}
+    )
     assert result["type"] is FlowResultType.FORM
-    assert result["step_id"] == "user"
+    assert result["step_id"] == provider
+    return result
+
+
+async def test_weg_flow(hass: HomeAssistant) -> None:
+    """Picking WEG asks for the sun.weg.net credentials and no server."""
+    result = await _pick(hass, PROVIDER_WEG)
+    assert CONF_HOST not in result["data_schema"].schema
 
     with _patch_client():
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], CREDS
         )
-
-    assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "plants"
+    # No energy flow on the WEG cloud, so no second interval to set.
+    assert CONF_FLOW_INTERVAL not in result["data_schema"].schema
 
-    with patch(
-        "custom_components.sunweg.async_setup_entry", return_value=True
-    ) as setup:
+    with patch("custom_components.sunweg.async_setup_entry", return_value=True):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {CONF_PLANTS: [str(PLANT_ID)], CONF_SCAN_INTERVAL: 300},
@@ -53,19 +81,44 @@ async def test_full_flow(hass: HomeAssistant) -> None:
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "user@example.com"
-    assert result["data"] == CREDS
+    assert result["data"] == {CONF_PROVIDER: PROVIDER_WEG, **CREDS}
     assert result["options"] == {
         CONF_PLANTS: [str(PLANT_ID)],
         CONF_SCAN_INTERVAL: 300,
     }
-    assert len(setup.mock_calls) == 1
+
+
+async def test_huawei_flow(hass: HomeAssistant) -> None:
+    """Picking Huawei asks for a server too, and for the energy flow interval."""
+    result = await _pick(hass, PROVIDER_HUAWEI)
+    assert CONF_HOST in result["data_schema"].schema
+
+    with _patch_client(unique_id=f"{DEFAULT_HOST}:user"):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], HUAWEI_CREDS
+        )
+    assert result["step_id"] == "plants"
+    assert CONF_FLOW_INTERVAL in result["data_schema"].schema
+
+    with patch("custom_components.sunweg.async_setup_entry", return_value=True):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {
+                CONF_PLANTS: [str(PLANT_ID)],
+                CONF_SCAN_INTERVAL: 300,
+                CONF_FLOW_INTERVAL: 10,
+            },
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == {CONF_PROVIDER: PROVIDER_HUAWEI, **HUAWEI_CREDS}
+    assert result["options"][CONF_FLOW_INTERVAL] == 10
 
 
 async def test_invalid_auth_recovers(hass: HomeAssistant) -> None:
     """A bad password shows an error, and the flow can then be completed."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await _pick(hass, PROVIDER_WEG)
 
     with _patch_client(side_effect=SunWegAuthError("invalido")):
         result = await hass.config_entries.flow.async_configure(
@@ -78,15 +131,19 @@ async def test_invalid_auth_recovers(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], CREDS
         )
-    assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "plants"
 
 
-async def test_cannot_connect(hass: HomeAssistant) -> None:
-    """An unreachable API is reported as such."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+async def test_provider_errors_are_both_recognised(hass: HomeAssistant) -> None:
+    """Each cloud raises its own exception type; the flow handles both."""
+    result = await _pick(hass, PROVIDER_HUAWEI)
+    with _patch_client(side_effect=FusionSolarAuthError("rejected")):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], HUAWEI_CREDS
+        )
+    assert result["errors"] == {"base": "invalid_auth"}
+
+    result = await _pick(hass, PROVIDER_WEG)
     with _patch_client(side_effect=SunWegConnectionError("boom")):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], CREDS
@@ -95,7 +152,11 @@ async def test_cannot_connect(hass: HomeAssistant) -> None:
 
 
 async def test_options_flow_changes_interval(hass: HomeAssistant, mock_api) -> None:
-    """The poll interval is configurable after setup."""
+    """The poll interval is configurable after setup.
+
+    The entry deliberately carries no provider key, the way entries created
+    before FusionSolar support did; those are WEG.
+    """
     entry = MockConfigEntry(
         domain=DOMAIN,
         data=CREDS,

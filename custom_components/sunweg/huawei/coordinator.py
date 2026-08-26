@@ -19,14 +19,8 @@ from .api import (
     FusionSolarError,
     Plant,
 )
-from .const import (
-    CONF_FLOW_INTERVAL,
-    CONF_PLANTS,
-    CONF_SCAN_INTERVAL,
-    DEFAULT_FLOW_INTERVAL,
-    DEFAULT_SCAN_INTERVAL,
-    DOMAIN,
-)
+from ..const import CONF_PLANTS, CONF_SCAN_INTERVAL, DOMAIN
+from .const import CONF_FLOW_INTERVAL, DEFAULT_FLOW_INTERVAL, DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,31 +1,20 @@
-"""Diagnostics for the SunWEG integration."""
+"""Diagnostics, dispatched to the provider this entry was created for."""
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from typing import Any
 
-from homeassistant.components.diagnostics import async_redact_data
-from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .coordinator import SunWegConfigEntry
-
-TO_REDACT = {CONF_PASSWORD, CONF_USERNAME, "serial", "esn", "Inversor"}
+from .const import is_huawei
+from .huawei import diagnostics as huawei_diagnostics
+from .weg import diagnostics as weg_diagnostics
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: SunWegConfigEntry
+    hass: HomeAssistant, entry: ConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator = entry.runtime_data
-    return {
-        "entry": {
-            "data": async_redact_data(dict(entry.data), TO_REDACT),
-            "options": dict(entry.options),
-        },
-        "plants": [
-            async_redact_data(asdict(plant), TO_REDACT)
-            for plant in coordinator.data.values()
-        ],
-    }
+    provider = huawei_diagnostics if is_huawei(entry) else weg_diagnostics
+    return await provider.async_get_config_entry_diagnostics(hass, entry)

@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.sunweg.api import SunWegAuthError, Inverter, parse_plant
+from custom_components.sunweg.weg.api import SunWegAuthError, Inverter, parse_plant
 from custom_components.sunweg.const import CONF_PLANTS, CONF_SCAN_INTERVAL, DOMAIN
 
 from .conftest import PLANT_FIXTURE, PLANT_ID
@@ -84,7 +84,7 @@ async def test_bad_credentials_trigger_reauth(hass: HomeAssistant) -> None:
     entry.add_to_hass(hass)
 
     with patch(
-        "custom_components.sunweg.api.SunWegClient._request",
+        "custom_components.sunweg.weg.api.SunWegClient._request",
         side_effect=SunWegAuthError("Login failed: invalido"),
     ):
         await hass.config_entries.async_setup(entry.entry_id)

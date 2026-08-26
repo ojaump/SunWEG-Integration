@@ -1,41 +1,46 @@
-# SunWEG and FusionSolar for Home Assistant
+# SunWEG / FusionSolar for Home Assistant
 
-Two Home Assistant integrations for solar plants: [SunWEG](https://sun.weg.net) (WEG inverters) and [FusionSolar](https://intl.fusionsolar.huawei.com) (Huawei inverters and meters). Both expose live plant and device telemetry as sensors.
+One Home Assistant integration for two solar clouds: [SunWEG](https://sun.weg.net) (WEG inverters) and [FusionSolar](https://intl.fusionsolar.huawei.com) (Huawei inverters and meters). You pick the brand when you add it.
 
-Historical data is intentionally left to Home Assistant: both integrations only read the current state, and long-term statistics come from the recorder.
-
-They are independent — install either or both.
-
-- [SunWEG](#sunweg) — the sections immediately below.
-- [FusionSolar](#fusionsolar) — at the end.
-
----
-
-# SunWEG
+Historical data is intentionally left to Home Assistant: the integration only reads the current state, and long-term statistics come from the recorder.
 
 ## Installation
 
-### HACS
+### HACS (recommended)
 
 1. HACS → ⋮ → **Custom repositories** → add `https://github.com/ojaump/SunWEG-Integration`, category **Integration**.
-2. Install **SunWEG**, then restart Home Assistant.
-3. **Settings → Devices & Services → Add Integration → SunWEG**.
-
-> HACS installs one integration per repository, so it only picks up `sunweg`. Install FusionSolar manually.
+2. Install **SunWEG / FusionSolar**, then restart Home Assistant.
+3. **Settings → Devices & Services → Add Integration → SunWEG / FusionSolar**.
 
 ### Manual
 
-Copy `custom_components/sunweg` and/or `custom_components/fusionsolar` into your Home Assistant `config/custom_components/` directory and restart, then add the integration from **Settings → Devices & Services**.
+Copy `custom_components/sunweg` into your Home Assistant `config/custom_components/` directory and restart.
 
 ## Configuration
 
-Sign in with the same email and password you use on sun.weg.net, then pick which plants to monitor and the update interval.
+The first step asks which cloud your inverters report to:
 
-The update interval defaults to **2 minutes** and can be changed at any time under the integration's **Configure** button (30 s – 60 min).
+| | |
+| --- | --- |
+| **WEG** | Sign in with the email and password you use on sun.weg.net. |
+| **Huawei** | Sign in with your FusionSolar portal username and password, and give the **server** your account lives on. FusionSolar is sharded by region, and an account only exists on one shard — use the host your browser shows once you are signed in, e.g. `https://intl.fusionsolar.huawei.com` or `https://eu5.fusionsolar.huawei.com`. |
 
-> The inverters only push a new reading to the SunWEG cloud roughly every **6 minutes**, so polling faster than that returns the same values and just adds load. The **Last reading** sensor shows the timestamp of the data itself, as opposed to when Home Assistant last fetched it.
+Then pick the plants to monitor and the update interval. Everything is changeable later under the integration's **Configure** button.
 
-## Entities
+| Interval | WEG | Huawei |
+| --- | --- | --- |
+| Update interval | 120 s (30 s – 60 min) | 300 s (60 s – 60 min) |
+| Energy flow interval | — | 10 s (5 s – 10 min) |
+
+> WEG inverters push a new reading to the cloud roughly every **6 minutes**, and FusionSolar recomputes its plant KPIs and device signals every few minutes, so polling faster than that returns the same values and just adds load. The **Last reading** sensor shows the timestamp of the data itself, as opposed to when Home Assistant last fetched it.
+
+FusionSolar's **energy flow** is the exception, and gets its own much faster interval. The integration holds a **live-data subscription** for each plant (`livedata/v1/subscribe`), which makes the cloud poll the devices every 2 seconds instead of serving its minutes-old cache. The subscription lapses after a minute, so it is renewed on the way into every flow poll.
+
+Both clouds can be configured at once — add the integration twice and pick a different brand each time.
+
+---
+
+## Entities: WEG
 
 Each plant becomes a device, with its inverters as child devices.
 
@@ -67,42 +72,9 @@ Each plant becomes a device, with its inverters as child devices.
 
 MPPT entities are created to match the number of trackers the inverter reports (`numMPPT`).
 
-## Energy dashboard
-
-Add the plant's **Total energy** sensor under **Solar production**.
-
-## Notes and limitations
-
-- This uses the private API behind the sun.weg.net web app; it is not an official or documented WEG interface and may change without notice.
-- Inverters that have been retired stay listed by the API with no reading attached. They are skipped rather than turned into permanently unavailable entities.
-- An inverter's lifetime total of `0` is treated as "no data" rather than a real value, so a glitching inverter cannot look like a meter reset and fabricate a spike in your energy statistics.
-- Credentials are stored by Home Assistant in the config entry; the integration logs in again automatically when the token (valid ~7 days) expires.
-
-## Disclaimer
-
-Not affiliated with or endorsed by WEG.
-
-
 ---
 
-# FusionSolar
-
-Reads the private API behind the FusionSolar web portal: plant KPIs, every inverter and meter under the plant, and the live energy flow.
-
-## Configuration
-
-Sign in with the same username and password you use on the portal, and give the **server address** your account lives on — FusionSolar is sharded by region, and the account only exists on one shard. It is the host in your browser's address bar once you are signed in, e.g. `https://intl.fusionsolar.huawei.com` or `https://eu5.fusionsolar.huawei.com`.
-
-Then pick the plants to monitor and the two intervals:
-
-| Interval | Default | Range | Covers |
-| --- | --- | --- | --- |
-| Update interval | 300 s | 60 s – 60 min | Plant KPIs, inverter and meter signals |
-| Energy flow interval | 10 s | 5 s – 10 min | The live energy flow only |
-
-The energy flow gets its own, much faster interval because the integration holds a **live-data subscription** for each plant (`livedata/v1/subscribe`), which makes the cloud poll the devices every 2 seconds instead of serving its minutes-old cache. The subscription lapses after a minute, so it is renewed on the way into every flow poll. Everything else is recomputed cloud-side every few minutes, so polling it faster only adds load.
-
-## Entities
+## Entities: Huawei
 
 Each plant is a device; its inverters and meters are child devices.
 
@@ -138,19 +110,43 @@ Active power, energy today, total energy, grid frequency, internal temperature, 
 
 Active power (signed, in W), imported and exported energy, apparent and reactive power, power factor, per-phase active power, phase A/B/C voltage and current, line voltage AB/BC/CA, and the run state. Reactive energy is diagnostic and disabled by default.
 
+---
+
 ## Energy dashboard
 
-Add the plant's **Total energy** under Solar production. On a plant with a meter, add the meter's **Imported energy** and **Exported energy** under grid consumption and return.
+Add the plant's **Total energy** sensor under **Solar production**. On a FusionSolar plant with a meter, add the meter's **Imported energy** and **Exported energy** under grid consumption and return.
 
 ## Notes and limitations
 
-- This uses the private API behind the FusionSolar web app; it is not the official Northbound/OpenAPI interface and may change without notice.
+Both providers use the private API behind the vendor's own web app. Neither is an official or documented interface, and either may change without notice.
+
+**WEG**
+
+- Inverters that have been retired stay listed by the API with no reading attached. They are skipped rather than turned into permanently unavailable entities.
+- An inverter's lifetime total of `0` is treated as "no data" rather than a real value, so a glitching inverter cannot look like a meter reset and fabricate a spike in your energy statistics.
+
+**Huawei**
+
+- This is not the official Northbound/OpenAPI interface.
 - Signal ids are only unique per device class — `10025` is the inverter run state and the meter's apparent power — so signals are mapped per device type. A device that is neither an inverter nor a meter (optimiser, battery, logger) gets no entities.
-- The plant's inverters and meters are discovered from the energy-flow graph. A device added later shows up after the integration is reloaded.
+- A plant's inverters and meters are discovered from the energy-flow graph. A device added later shows up after the integration is reloaded.
 - Run-state and status values come back in the account's portal language, not Home Assistant's.
 - Battery flow sensors are wired to the documented charge/discharge labels but were not verified against a real storage plant.
-- Credentials are stored by Home Assistant in the config entry; the integration signs in again automatically when the session expires.
+
+Credentials are stored by Home Assistant in the config entry; the integration signs in again automatically when the token or session expires.
+
+## Layout
+
+```
+custom_components/sunweg/
+├── __init__.py, sensor.py, binary_sensor.py, diagnostics.py   # dispatch on the entry's provider
+├── config_flow.py, const.py                                   # brand picker, shared keys
+├── weg/                                                       # sun.weg.net
+└── huawei/                                                    # FusionSolar
+```
+
+A config entry records its provider in `data["provider"]`. Entries created before FusionSolar support existed have no such key and are treated as WEG, so they keep working untouched.
 
 ## Disclaimer
 
-Not affiliated with or endorsed by Huawei or WEG.
+Not affiliated with or endorsed by WEG or Huawei.

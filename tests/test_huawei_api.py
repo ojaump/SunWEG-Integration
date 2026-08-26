@@ -3,15 +3,15 @@
 import json
 from pathlib import Path
 
-from custom_components.fusionsolar.api import (
+from custom_components.sunweg.huawei.api import (
     _quantity_kw,
     parse_device,
     parse_energy_flow,
     parse_plant,
 )
-from custom_components.fusionsolar.const import MOC_INVERTER, MOC_METER
+from custom_components.sunweg.huawei.const import MOC_INVERTER, MOC_METER
 
-FIXTURES = Path(__file__).parent / "fixtures" / "fusionsolar"
+FIXTURES = Path(__file__).parent / "fixtures" / "huawei"
 
 
 def _load(name: str) -> dict:

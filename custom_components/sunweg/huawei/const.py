@@ -1,14 +1,10 @@
-"""Constants for the FusionSolar integration."""
+"""Constants for the FusionSolar (Huawei) provider."""
 
 from __future__ import annotations
 
 from typing import Final
 
-DOMAIN: Final = "fusionsolar"
-
 CONF_HOST: Final = "host"
-CONF_PLANTS: Final = "plants"
-CONF_SCAN_INTERVAL: Final = "scan_interval"
 CONF_FLOW_INTERVAL: Final = "flow_interval"
 
 # FusionSolar is sharded by region; the account only exists on one of them.
