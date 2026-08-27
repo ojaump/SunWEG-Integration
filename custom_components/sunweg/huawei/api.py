@@ -28,6 +28,9 @@ _RELOGIN_CODE = 305
 # fast flow interval does not retry a broken endpoint every few seconds.
 _SUBSCRIBE_RETRY = 300
 
+# How often to beat the session's heartbeat. The web app uses exactly 60 s.
+_KEEP_ALIVE_EVERY = 60
+
 
 class FusionSolarError(Exception):
     """Base error for the FusionSolar API."""
@@ -270,6 +273,7 @@ class FusionSolarClient:
         self._username = username
         self._password = password
         self._roarand: str | None = None
+        self._last_keep_alive = 0.0
         self._login_lock = asyncio.Lock()
         # Device metadata never changes; the subscription does, on a timer.
         self._device_info: dict[str, dict[str, Any]] = {}
@@ -313,13 +317,7 @@ class FusionSolarClient:
                 response.raise_for_status()
                 await response.read()
 
-            async with self._session.get(
-                f"{self._host}/rest/dpcloud/auth/v1/keep-alive",
-                headers=self._headers(),
-                timeout=_TIMEOUT,
-            ) as response:
-                response.raise_for_status()
-                token = (await response.json(content_type=None)).get("payload")
+            token = await self._async_keep_alive()
         except FusionSolarError:
             raise
         except aiohttp.ClientError as err:
@@ -336,6 +334,44 @@ class FusionSolarClient:
         self._roarand = token
         # A new session invalidates whatever the old one had subscribed.
         self._subscribed_until.clear()
+
+    async def _async_keep_alive(self) -> str | None:
+        """Beat the session's heartbeat and return the CSRF token it hands back.
+
+        This is what actually holds the session open. Reading data does not:
+        the web app marks every data call `x-non-renewal-session: true` and
+        leans entirely on this endpoint, which it hits once a minute. Skip it
+        and the session lapses after roughly half an hour, mid-poll.
+
+        Called straight off the session rather than through `_request`, which
+        would recurse back into here.
+        """
+        self._last_keep_alive = time.monotonic()
+        async with self._session.get(
+            f"{self._host}/rest/dpcloud/auth/v1/keep-alive",
+            headers=self._headers(),
+            timeout=_TIMEOUT,
+        ) as response:
+            response.raise_for_status()
+            payload = (await response.json(content_type=None)).get("payload")
+        return payload or None
+
+    async def _async_heartbeat(self) -> None:
+        """Keep the session alive, piggybacked on whatever traffic is flowing.
+
+        The stamp is taken before the call, not after, so a burst of parallel
+        requests fires one heartbeat rather than one each.
+        """
+        if time.monotonic() - self._last_keep_alive < _KEEP_ALIVE_EVERY:
+            return
+        try:
+            if token := await self._async_keep_alive():
+                # The token can rotate; the old one stops being accepted.
+                self._roarand = token
+        except (aiohttp.ClientError, TimeoutError, ValueError) as err:
+            # Not fatal on its own: the request that follows will find out
+            # whether the session is really gone, and log in again if so.
+            _LOGGER.debug("Session heartbeat failed: %s", err)
 
     def _headers(self) -> dict[str, str]:
         """Headers the web app sends on every call."""
@@ -368,6 +404,7 @@ class FusionSolarClient:
         """
         if self._roarand is None:
             await self._async_relogin(None)
+        await self._async_heartbeat()
 
         for attempt in (1, 2):
             token = self._roarand
@@ -383,12 +420,18 @@ class FusionSolarClient:
                     data: Any = {}
                     if not expired:
                         response.raise_for_status()
-                        data = await response.json(content_type=None)
-                        if isinstance(data, dict):
-                            expired = _RELOGIN_CODE in (
-                                data.get("code"),
-                                data.get("failCode"),
-                            )
+                        try:
+                            data = await response.json(content_type=None)
+                        except (json.JSONDecodeError, ValueError):
+                            # A lapsed session is answered with the login page
+                            # rather than an error, so unparseable means dead.
+                            expired = True
+                        else:
+                            if isinstance(data, dict):
+                                expired = _RELOGIN_CODE in (
+                                    data.get("code"),
+                                    data.get("failCode"),
+                                )
                     if expired:
                         if attempt == 1:
                             _LOGGER.debug(
